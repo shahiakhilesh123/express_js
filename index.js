@@ -1,22 +1,18 @@
 const express = require('express');
-const multer =  require('multer');
+const EventEmitter = require('events');
+
 const app = express();
+const event = new EventEmitter();
+let count = 0;
 
-const upload = multer({
-    storage:multer.diskStorage({
-        destination:function(req, file, cb)
-        {
-            cb(null, "uploads")
-        },
-        filename:function(req, file, cb)
-        {
-            cb(null, file.fieldname+"_"+Date.now()+".jpg")
-        }
-    })
-}).single('user_file');
+event.on("counterApi", ()=>{
+    count++;
+    console.log('event called '+count);
+})
 
-app.post('/upload', upload, (req, resp)=>{
-    resp.send('File Uploaded');
+app.get('/', ()=>{
+    console.log('Event Api')
+    event.emit('counterApi')
 })
 
 app.listen(5000);
